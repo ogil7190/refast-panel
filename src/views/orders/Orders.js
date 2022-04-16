@@ -38,6 +38,7 @@ const parseOrders = (orders) => {
           ? `${RUPEE_SYMBOL}${parseAmountInRupees(order.cashbackDetails.cashbackAmount || 0)}`
           : '-'
       }`,
+      updated_at: order.updated_at,
     }
   })
 }
@@ -80,7 +81,7 @@ const Users = () => {
 
   const loadMoreOrders = () => {
     if (orders && orders.length > 0) {
-      fetchOrders(orders[orders.length - 1].created_at).then((data) => {
+      fetchOrders(orders[orders.length - 1].updated_at).then((data) => {
         const parsedData = parseOrders(data)
         setOrders([...orders, ...parsedData])
         if (data && data.length === 0) {

@@ -17,7 +17,7 @@ import CIcon from '@coreui/icons-react'
 import { cilPeople } from '@coreui/icons'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import { GET_USERS_URL, GET_USER_BY_ID_URL } from 'src/urls'
+import { GET_BALANCE_BY_UID_URL, GET_USERS_URL, GET_USER_BY_ID_URL } from 'src/urls'
 import { parseAmountInRupees, parseDateReadable, RUPEE_SYMBOL } from 'src/utils'
 
 const Users = () => {
@@ -104,6 +104,20 @@ const Users = () => {
     }
   }
 
+  const getUserBalance = (user, index) => {
+    const url = `${GET_BALANCE_BY_UID_URL}?uid=${user.uid}`
+    axios.get(url).then((resp) => {
+      if (resp.data && resp.data.success) {
+        const _users = [...users]
+        _users[index] = {
+          ..._users[index],
+          balance: resp.data.data,
+        }
+        setUsers(_users)
+      }
+    })
+  }
+
   return (
     <>
       <CInputGroup className="mb-3">
@@ -148,8 +162,12 @@ const Users = () => {
               <CTableDataCell className="text-center">
                 <div>{parseDateReadable(item.updated_at, true)}</div>
               </CTableDataCell>
-              <CTableDataCell>
-                <div>{`${RUPEE_SYMBOL}${parseAmountInRupees(item.balance || 0)}`}</div>
+              <CTableDataCell onClick={() => getUserBalance(item, index)}>
+                <div style={{ color: 'green', cursor: 'pointer' }}>
+                  {item.balance !== undefined
+                    ? `${RUPEE_SYMBOL}${parseAmountInRupees(item.balance || 0)}`
+                    : 'Get Balance'}
+                </div>
               </CTableDataCell>
             </CTableRow>
           ))}
