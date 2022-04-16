@@ -38,6 +38,11 @@ const parseOrders = (orders) => {
           ? `${RUPEE_SYMBOL}${parseAmountInRupees(order.cashbackDetails.cashbackAmount || 0)}`
           : '-'
       }`,
+      operator:
+        order.orderMetaData && order.orderMetaData.operatorDetails
+          ? order.orderMetaData.operatorDetails.operator_name ||
+            order.orderMetaData.operatorDetails.operatorName
+          : '-',
       updated_at: order.updated_at,
     }
   })
@@ -144,6 +149,7 @@ const Users = () => {
             <CTableHeaderCell>Status</CTableHeaderCell>
             <CTableHeaderCell>Paid</CTableHeaderCell>
             <CTableHeaderCell>Type</CTableHeaderCell>
+            <CTableHeaderCell>Operator</CTableHeaderCell>
             <CTableHeaderCell>User</CTableHeaderCell>
             <CTableHeaderCell>Payment Type</CTableHeaderCell>
             <CTableHeaderCell>Total Amount</CTableHeaderCell>
@@ -167,6 +173,9 @@ const Users = () => {
               </CTableDataCell>
               <CTableDataCell>
                 <div>{item.type}</div>
+              </CTableDataCell>
+              <CTableDataCell>
+                <div>{item.operator}</div>
               </CTableDataCell>
               <CTableDataCell>
                 <div>{item.uid}</div>
