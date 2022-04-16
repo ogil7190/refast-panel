@@ -1,4 +1,4 @@
-export const HOST_URL = 'http://localhost:4000'
+export const HOST_URL = 'https://refastapp-backend.herokuapp.com'
 export const GET_STATS_URL = `${HOST_URL}/panel/stats`
 export const GET_ORDERS_URL = `${HOST_URL}/panel/allOrders`
 export const GET_USERS_URL = `${HOST_URL}/panel/allUsers`
