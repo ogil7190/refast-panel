@@ -14,7 +14,7 @@ import {
 } from '@coreui/react'
 import axios from 'axios'
 import { GET_ORDERS_URL, GET_ORDER_BY_ID_URL } from 'src/urls'
-import { parseAmountInRupees, RUPEE_SYMBOL } from 'src/utils'
+import { parseAmountInRupees, parseDateReadable, RUPEE_SYMBOL } from 'src/utils'
 
 const parseOrders = (orders) => {
   return orders.map((order) => {
@@ -146,6 +146,7 @@ const Users = () => {
         <CTableHead color="light">
           <CTableRow>
             <CTableHeaderCell>Order ID</CTableHeaderCell>
+            <CTableHeaderCell>Date</CTableHeaderCell>
             <CTableHeaderCell>Status</CTableHeaderCell>
             <CTableHeaderCell>Paid</CTableHeaderCell>
             <CTableHeaderCell>Type</CTableHeaderCell>
@@ -164,6 +165,9 @@ const Users = () => {
             <CTableRow v-for="item in tableItems" key={index}>
               <CTableDataCell>
                 <div>{item.oid}</div>
+              </CTableDataCell>
+              <CTableDataCell>
+                <div>{parseDateReadable(item.updated_at, true)}</div>
               </CTableDataCell>
               <CTableDataCell>
                 <div>{item.status}</div>
