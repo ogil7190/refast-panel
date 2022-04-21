@@ -6,7 +6,7 @@ const getHost = () => {
     return 'https://refastapp-bckend.herokuapp.com'
   }
 }
-export const HOST_URL = 'http://refast-proxy.herokuapp.com'
+export const HOST_URL = 'https://refast-proxy.herokuapp.com'
 export const GET_STATS_URL = `${HOST_URL}/panel/stats`
 export const GET_ORDERS_URL = `${HOST_URL}/panel/allOrders`
 export const GET_USERS_URL = `${HOST_URL}/panel/allUsers`
