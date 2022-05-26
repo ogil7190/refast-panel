@@ -140,6 +140,7 @@ const Users = () => {
             <CTableHeaderCell>User Id</CTableHeaderCell>
             <CTableHeaderCell>Full Name</CTableHeaderCell>
             <CTableHeaderCell className="text-center">Mobile</CTableHeaderCell>
+            <CTableHeaderCell className="text-center">Referrer</CTableHeaderCell>
             <CTableHeaderCell className="text-center">Last Active</CTableHeaderCell>
             <CTableHeaderCell>Balance</CTableHeaderCell>
           </CTableRow>
@@ -158,6 +159,9 @@ const Users = () => {
               </CTableDataCell>
               <CTableDataCell className="text-center">
                 <div>{item.mobileNumber}</div>
+              </CTableDataCell>
+              <CTableDataCell className="text-center">
+                <div>{item.referredBy || '-'}</div>
               </CTableDataCell>
               <CTableDataCell className="text-center">
                 <div>{parseDateReadable(item.updated_at, true)}</div>

@@ -1,7 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { get, Keys } from 'src/services/dataStore.service'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
 
 const DefaultLayout = () => {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = get(Keys.TOKEN)
+    if (!token) {
+      // navigate('/login', { replace: true })
+    }
+  }, [navigate])
+
   return (
     <div>
       <AppSidebar />

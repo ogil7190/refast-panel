@@ -1,5 +1,4 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useRef, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -12,11 +11,93 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
+  CToast,
+  CToastBody,
+  CToastHeader,
+  CToaster,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import { genericPost } from 'src/services/genericPost.service'
+import { URL_AUTH_LOGIN } from 'src/urls'
+import { get } from 'lodash'
+import { Navigate } from 'react-router-dom'
+import { Keys, persist, set } from 'src/services/dataStore.service'
 
 const Login = () => {
+  const [state, setState] = useState({})
+  const [toast, setToast] = useState(0)
+  const [loggedIn, setLoggedIn] = useState(false)
+
+  const toaster = useRef()
+
+  const attemptLogin = () => {
+    const { resultPromise } = genericPost({
+      path: URL_AUTH_LOGIN,
+      data: {
+        ...state,
+      },
+    })
+
+    resultPromise
+      .then((resp) => {
+        if (resp && resp.body) {
+          const data = resp.body
+          if (!data.error) {
+            const token = get(data, 'data.token', null)
+            const userDetails = get(data, 'data.userDetails', null)
+            if (token && userDetails) {
+              set(Keys.TOKEN, token)
+              set(Keys.USER_DETAILS, userDetails)
+              persist()
+              setLoggedIn(true)
+            }
+          } else {
+            setToast(
+              addToast({
+                title: 'Login Failed',
+                error: data.mssg,
+              }),
+            )
+          }
+        }
+      })
+      .catch((e) => console.log(e))
+  }
+
+  const handleInputChange = (key, value) => {
+    setState({
+      ...state,
+      [key]: value,
+    })
+  }
+
+  const addToast = ({ title, error }) => {
+    return (
+      <CToast>
+        <CToastHeader closeButton>
+          <svg
+            className="rounded me-2"
+            width="20"
+            height="20"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid slice"
+            focusable="false"
+            role="img"
+          >
+            <rect width="100%" height="100%" fill="#007aff"></rect>
+          </svg>
+          <strong className="me-auto">{title}</strong>
+        </CToastHeader>
+        <CToastBody>{error}</CToastBody>
+      </CToast>
+    )
+  }
+
+  if (loggedIn) {
+    return <Navigate to="/" replace />
+  }
+
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -32,13 +113,18 @@ const Login = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
+                      <CFormInput
+                        onChange={(event) => handleInputChange('username', event.target.value)}
+                        placeholder="Username"
+                        autoComplete="username"
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
+                        onChange={(event) => handleInputChange('password', event.target.value)}
                         type="password"
                         placeholder="Password"
                         autoComplete="current-password"
@@ -46,13 +132,8 @@ const Login = () => {
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
+                        <CButton color="primary" className="px-4" onClick={attemptLogin}>
                           Login
-                        </CButton>
-                      </CCol>
-                      <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0">
-                          Forgot password?
                         </CButton>
                       </CCol>
                     </CRow>
@@ -63,15 +144,7 @@ const Login = () => {
                 <CCardBody className="text-center">
                   <div>
                     <h2>Sign up</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
-                    <Link to="/register">
-                      <CButton color="primary" className="mt-3" active tabIndex={-1}>
-                        Register Now!
-                      </CButton>
-                    </Link>
+                    <p>{'Ask Super Admin to give you permissions & create your account'}</p>
                   </div>
                 </CCardBody>
               </CCard>
@@ -79,6 +152,7 @@ const Login = () => {
           </CCol>
         </CRow>
       </CContainer>
+      <CToaster ref={toaster} push={toast} placement="top-end" />
     </div>
   )
 }

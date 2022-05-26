@@ -26,3 +26,12 @@ export const parseDateReadable = (dateParam, withTime = false) => {
     ? `${dateStr}-${monthStr}-${yearStr}:${formatAMPM(date)}`
     : `${dateStr}-${monthStr}-${yearStr}`
 }
+
+export const generateShortId = (size = 10) => {
+  const POSSIBLES = 'qwertyuiopasdfghjklzxcvbm1234567890'
+  let str = ''
+  for (let i = 0; i < size; i++) {
+    str += POSSIBLES.charAt(Math.floor(Math.random() * POSSIBLES.length))
+  }
+  return str
+}
