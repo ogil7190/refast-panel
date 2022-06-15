@@ -9,7 +9,7 @@ const DefaultLayout = () => {
   useEffect(() => {
     const token = get(Keys.TOKEN)
     if (!token) {
-      // navigate('/login', { replace: true })
+      navigate('/login', { replace: true })
     }
   }, [navigate])
 

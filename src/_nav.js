@@ -1,18 +1,7 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import {
-  cilBell,
-  cilCalculator,
-  cilChartPie,
-  cilCursor,
-  cilDrop,
-  cilNotes,
-  cilPencil,
-  cilPuzzle,
-  cilSpeedometer,
-  cilStar,
-} from '@coreui/icons'
-import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
+import { cilMoney, cilUser, cilBook, cilSearch, cilSpeedometer } from '@coreui/icons'
+import { CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
   {
@@ -27,19 +16,25 @@ const _nav = [
   },
   {
     component: CNavTitle,
-    name: 'Categories',
+    name: 'My Views',
   },
   {
     component: CNavItem,
     name: 'Users',
     to: '/category/users',
-    icon: <CIcon icon={cilDrop} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'Orders',
     to: '/category/orders',
-    icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Payments',
+    to: '/category/payments',
+    icon: <CIcon icon={cilMoney} customClassName="nav-icon" />,
   },
 ]
 

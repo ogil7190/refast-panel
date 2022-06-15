@@ -11,13 +11,16 @@ import {
   CButton,
   CInputGroup,
   CFormInput,
-  CInputGroupText,
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
+  CDropdownItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPeople } from '@coreui/icons'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import { GET_BALANCE_BY_UID_URL, GET_USERS_URL, GET_USER_BY_ID_URL } from 'src/urls'
+import { GET_BALANCE_BY_UID_URL, GET_USERS_URL, SEARCH_USER_URL } from 'src/urls'
 import { parseAmountInRupees, parseDateReadable, RUPEE_SYMBOL } from 'src/utils'
 
 const Users = () => {
@@ -25,6 +28,7 @@ const Users = () => {
   const [noMore, setNoMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [prevUsers, setPrevUsers] = useState(null)
+  const [searchBy, setSearchBy] = useState('User ID')
 
   const fetchUsers = (date) => {
     let url = GET_USERS_URL
@@ -68,21 +72,19 @@ const Users = () => {
     }
   }
 
-  const getUserById = (uid) => {
-    let url = GET_USER_BY_ID_URL
-    if (uid) {
-      url = `${url}?uid=${uid}`
+  const getUserByTag = (tag) => {
+    let url = SEARCH_USER_URL
+    if (tag) {
+      const key = TAGS[searchBy]
+      url = `${url}?${key}=${tag}&tag=${key}`
       setLoading(true)
       axios
         .get(url)
         .then((resp) => {
           if (resp.data && resp.data.success) {
             setPrevUsers(users)
-            setUsers([
-              {
-                ...resp.data.data,
-              },
-            ])
+            const _orders = [...resp.data.data]
+            setUsers(_orders)
             setNoMore(true)
           }
         })
@@ -93,14 +95,12 @@ const Users = () => {
   }
 
   const handleChange = (e) => {
-    const uid = e.target.value
-    if (uid.length === 12) {
-      getUserById(uid)
-    }
-
-    if (uid === '' && prevUsers) {
+    const tag = e.target.value
+    if (tag === '' && prevUsers) {
       setUsers(prevUsers)
       setNoMore(false)
+    } else {
+      getUserByTag(tag)
     }
   }
 
@@ -118,17 +118,38 @@ const Users = () => {
     })
   }
 
+  const handleSearchByChange = (by) => {
+    setSearchBy(by)
+  }
+
+  const TAGS = {
+    Name: 'name',
+    Referrer: 'referrer',
+    'User ID': 'uid',
+    'Mobile Number': 'mobileNumber',
+  }
+
   return (
     <>
       <CInputGroup className="mb-3">
-        <CInputGroupText id="basic-addon1">
-          <CIcon icon={cilPeople} />
-        </CInputGroupText>
+        <CDropdown>
+          <CDropdownToggle color="primary">{searchBy ? searchBy : 'Search By'}</CDropdownToggle>
+          <CDropdownMenu>
+            <CDropdownItem onClick={() => handleSearchByChange('User ID')}>
+              Search User ID
+            </CDropdownItem>
+            <CDropdownItem onClick={() => handleSearchByChange('Mobile Number')}>
+              Search Mobile Number
+            </CDropdownItem>
+            <CDropdownItem onClick={() => handleSearchByChange('Referrer')}>
+              Search Referrer
+            </CDropdownItem>
+          </CDropdownMenu>
+        </CDropdown>
         <CFormInput
-          placeholder="Enter User Id"
-          aria-label="User Id"
+          placeholder={`Enter ${searchBy}`}
+          aria-label={searchBy}
           onChange={handleChange}
-          aria-describedby="basic-addon1"
         />
       </CInputGroup>
       <CTable align="middle" className="mb-0 border" hover responsive>

@@ -61,7 +61,7 @@ const routes = [
   { path: '/dashboard-old', name: 'Dashboard New', element: Dashboard },
   { path: '/category/users', name: 'Users', element: Users },
   { path: '/category/orders', name: 'Orders', element: Orders },
-  { path: '/category/payment', name: 'Payments', element: Payments },
+  { path: '/category/payments', name: 'Payments', element: Payments },
 
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },

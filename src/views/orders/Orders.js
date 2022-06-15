@@ -9,11 +9,14 @@ import {
   CSpinner,
   CButton,
   CInputGroup,
-  CInputGroupText,
   CFormInput,
+  CDropdown,
+  CDropdownToggle,
+  CDropdownItem,
+  CDropdownMenu,
 } from '@coreui/react'
 import axios from 'axios'
-import { GET_ORDERS_URL, GET_ORDER_BY_ID_URL } from 'src/urls'
+import { GET_ORDERS_URL, SEARCH_ORDER_URL } from 'src/urls'
 import { parseAmountInRupees, parseDateReadable, RUPEE_SYMBOL } from 'src/utils'
 
 const parseOrders = (orders) => {
@@ -43,6 +46,7 @@ const parseOrders = (orders) => {
           ? order.orderMetaData.operatorDetails.operator_name ||
             order.orderMetaData.operatorDetails.operatorName
           : '-',
+      mobileNumber: (order.orderMetaData && order.orderMetaData.mobileNumber) || '-',
       updated_at: order.updated_at,
     }
   })
@@ -53,6 +57,7 @@ const Users = () => {
   const [noMore, setNoMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [prevOrders, setPrevOrders] = useState(null)
+  const [searchBy, setSearchBy] = useState('Order ID')
 
   const fetchOrders = (date) => {
     let url = GET_ORDERS_URL
@@ -96,18 +101,19 @@ const Users = () => {
     }
   }
 
-  const getOrderById = (oid) => {
-    let url = GET_ORDER_BY_ID_URL
-    if (oid) {
-      url = `${url}?oid=${oid}`
+  const getOrderByTag = (tag) => {
+    let url = SEARCH_ORDER_URL
+    if (tag) {
+      const key = TAGS[searchBy]
+      url = `${url}?${key}=${tag}&tag=${key}`
       setLoading(true)
       axios
         .get(url)
         .then((resp) => {
           if (resp.data && resp.data.success) {
             setPrevOrders(orders)
-            const _ordersById = [{ ...resp.data.data }]
-            setOrders(parseOrders(_ordersById))
+            const _orders = [...resp.data.data]
+            setOrders(parseOrders(_orders))
             setNoMore(true)
           }
         })
@@ -118,28 +124,50 @@ const Users = () => {
   }
 
   const handleChange = (e) => {
-    const oid = e.target.value
-    if (oid.length === 14) {
-      getOrderById(oid)
-    }
-
-    if (oid === '' && prevOrders) {
+    const tag = e.target.value
+    if (tag === '' && prevOrders) {
       setOrders(prevOrders)
       setNoMore(false)
+    } else {
+      getOrderByTag(tag)
     }
+  }
+
+  const handleSearchByChange = (by) => {
+    setSearchBy(by)
+  }
+
+  const TAGS = {
+    'Order ID': 'oid',
+    'User ID': 'uid',
+    'Mobile Number': 'mobileNumber',
+    Amount: 'amount',
   }
 
   return (
     <>
       <CInputGroup className="mb-3">
-        <CInputGroupText id="basic-addon1">
-          <div>{'Order Id'}</div>
-        </CInputGroupText>
+        <CDropdown>
+          <CDropdownToggle color="primary">{searchBy ? searchBy : 'Search By'}</CDropdownToggle>
+          <CDropdownMenu>
+            <CDropdownItem onClick={() => handleSearchByChange('Order ID')}>
+              Search Order ID
+            </CDropdownItem>
+            <CDropdownItem onClick={() => handleSearchByChange('User ID')}>
+              Search User ID
+            </CDropdownItem>
+            <CDropdownItem onClick={() => handleSearchByChange('Mobile Number')}>
+              Search Mobile Number
+            </CDropdownItem>
+            <CDropdownItem onClick={() => handleSearchByChange('Amount')}>
+              Search Amount
+            </CDropdownItem>
+          </CDropdownMenu>
+        </CDropdown>
         <CFormInput
-          placeholder="Enter Order Id"
-          aria-label="Order Id"
+          placeholder={`Enter ${searchBy}`}
+          aria-label={searchBy}
           onChange={handleChange}
-          aria-describedby="basic-addon1"
         />
       </CInputGroup>
       <CTable align="middle" cellSpacing={100} className="mb-0 border" hover responsive={false}>
@@ -151,6 +179,7 @@ const Users = () => {
             <CTableHeaderCell>Paid</CTableHeaderCell>
             <CTableHeaderCell>Type</CTableHeaderCell>
             <CTableHeaderCell>Operator</CTableHeaderCell>
+            <CTableHeaderCell>Number</CTableHeaderCell>
             <CTableHeaderCell>User</CTableHeaderCell>
             <CTableHeaderCell>Payment Type</CTableHeaderCell>
             <CTableHeaderCell>Total Amount</CTableHeaderCell>
@@ -180,6 +209,9 @@ const Users = () => {
               </CTableDataCell>
               <CTableDataCell>
                 <div>{item.operator}</div>
+              </CTableDataCell>
+              <CTableDataCell>
+                <div>{item.mobileNumber}</div>
               </CTableDataCell>
               <CTableDataCell>
                 <div>{item.uid}</div>
